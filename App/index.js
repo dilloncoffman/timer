@@ -89,6 +89,8 @@ export default class App extends React.Component {
     state = {
         remainingSeconds: 5, // timer's remaining seconds
         isRunning: false, // to keep track of if timer is running
+        selectedMinutes: '0', // use strings to work with picker
+        selectedSeconds: '5',
     }
 
     interval = null; 
@@ -108,7 +110,9 @@ export default class App extends React.Component {
 
     start = () => {
         this.setState(state => ({
-            remainingSeconds: state.remainingSeconds - 1,
+            remainingSeconds: 
+                parseInt(state.selectedMinutes) * 60 + 
+                parseInt(state.selectedSeconds), // calculate what remaining seconds are initially
             isRunning: true,
         }));
 
@@ -133,9 +137,10 @@ export default class App extends React.Component {
         <Picker
           style={styles.picker}
           itemStyle={styles.pickerItem}
-          selectedValue="2"
+          selectedValue={this.state.selectedMinutes} // user-selected minutes
           onValueChange={itemValue => {
-            // update state eventually
+            // update state when picking minutes
+            this.setState({ selectedMinutes: itemValue });
         }}
           mode="dropdown" // fixes layout of picker on Android
         >
@@ -147,9 +152,10 @@ export default class App extends React.Component {
         <Picker
           style={styles.picker}
           itemStyle={styles.pickerItem}
-          selectedValue="2"
+          selectedValue={this.state.selectedSeconds} // user-selected seconds
           onValueChange={itemValue => {
-          // update state eventually
+          // update state when picking seconds
+          this.setState({ selectedSeconds: itemValue });
         }}
           mode="dropdown" // fixes layout of picker on Android
         >
