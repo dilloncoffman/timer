@@ -6,6 +6,8 @@ import {
     StatusBar, // use to change color of time and cell network at very top
     TouchableOpacity, // use as a customizable button
     Dimensions, // use to get screen size to style start/stop button
+    Picker, // use to allow user to choose time
+    Platform, // use to make platform specific changes in styles
 } from 'react-native';
 
 const screen = Dimensions.get('window');
@@ -40,6 +42,24 @@ const styles = StyleSheet.create({
     timerText: {
       color: "#fff",
       fontSize: 90
+    },
+    picker: {
+        width: 50,
+        ...Platform.select({ // change styles for picker on Android
+            android: {
+                color: '#fff',
+                backgroundColor: '#07121B',
+                marginLeft: 10,
+            }
+        })
+    },
+    pickerItem: {
+        color: '#fff',
+        fontSize: 20
+    },
+    pickerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     }
   });
 
@@ -50,6 +70,20 @@ const getRemaining = (time) => { // gets remaining time in minutes and seconds f
     const seconds = time - minutes * 60;
     return { minutes: formatNumber(minutes), seconds: formatNumber(seconds) };
 };
+
+const createArray = length => { // populates minutes and seconds arrays
+    const arr = [];
+    let i = 0;
+    while (i < length) {
+      arr.push(i.toString());
+      i += 1;
+    }
+  
+    return arr;
+};
+
+const AVAILABLE_MINUTES = createArray(10); // max minutes is 10
+const AVAILABLE_SECONDS = createArray(60); // max seconds 60
 
 export default class App extends React.Component {
     state = {
@@ -94,13 +128,48 @@ export default class App extends React.Component {
         });
     }
 
+    renderPickers = () => (
+      <View style={styles.pickerContainer}>
+        <Picker
+          style={styles.picker}
+          itemStyle={styles.pickerItem}
+          selectedValue="2"
+          onValueChange={itemValue => {
+            // update state eventually
+        }}
+          mode="dropdown" // fixes layout of picker on Android
+        >
+          {AVAILABLE_MINUTES.map(value => ( // map over values for minutes onto Picker item
+            <Picker.Item key={value} label={value} value={value} />
+        ))}
+        </Picker>
+        <Text style={styles.pickerItem}>minutes</Text>
+        <Picker
+          style={styles.picker}
+          itemStyle={styles.pickerItem}
+          selectedValue="2"
+          onValueChange={itemValue => {
+          // update state eventually
+        }}
+          mode="dropdown" // fixes layout of picker on Android
+        >
+          {AVAILABLE_SECONDS.map(value => (
+            <Picker.Item key={value} label={value} value={value} />
+        ))}
+        </Picker>
+        <Text style={styles.pickerItem}>seconds</Text>
+      </View>
+        )
+
     render() {
         const { minutes, seconds } = getRemaining(this.state.remainingSeconds);
 
         return (
           <View style={styles.container}>
             <StatusBar barStyle="light-content" />
-            <Text style={styles.timerText}>{`${minutes}:${seconds}`}</Text>
+            {this.state.isRunning ? ( // if timer is running render time, otherwise render pickers
+              <Text style={styles.timerText}>{`${minutes}:${seconds}`}</Text>
+            ): this.renderPickers() }
             {this.state.isRunning ? ( // if timer is running render stop button
               <TouchableOpacity onPress={this.stop} style={[styles.button, styles.buttonStop]}>
                 <Text style={[styles.buttonText, styles.buttonTextStop]}>Stop</Text>
