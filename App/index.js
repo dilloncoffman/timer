@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
       flex: 1, // container takes up entirety of available space
       backgroundColor: '#07121B',
       alignItems: 'center', // vertically centers content
-      justifyContent: 'center', // horizontally centers content
+      justifyContent: 'center' // horizontally centers content
     },
     button: {
         borderWidth: 10,
@@ -25,25 +25,44 @@ const styles = StyleSheet.create({
         borderRadius: screen.width / 2, // makes circle
         alignItems: 'center', // aligns start/stop text center in circle
         justifyContent: 'center', // display in react native is by default flex, as opposed to on web it wouldn't be
-
+        marginTop: 30,
     },
     buttonText: {
         fontSize: 45,
         color: '#89AAFF'
+    },
+    timerText: {
+        color: '#fff',
+        fontSize: 90
     }
   });
 
+const formatNumber = (number) => `0${number}`.slice(-2); // gets last two digits only for string to format properly
+
+const getRemaining = (time) => { // gets remaining time in minutes and seconds from remainingSeconds state
+    const minutes = Math.floor(time / 60);
+    const seconds = time - minutes * 60;
+    return { minutes: formatNumber(minutes), seconds: formatNumber(seconds) };
+};
+
 export default class App extends React.Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <StatusBar barStyle="light-content" />
-        <TouchableOpacity onPress={() => alert('Testing...')} style={styles.button}>
-          <Text style={styles.buttonText}>Start</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+    state = {
+        remainingSeconds: 90,
+    }
+
+    render() {
+        const { minutes, seconds } = getRemaining(this.state.remainingSeconds);
+
+        return (
+          <View style={styles.container}>
+            <StatusBar barStyle="light-content" />
+            <Text style={styles.timerText}>{`${minutes}:${seconds}`}</Text>
+            <TouchableOpacity onPress={() => alert('Testing...')} style={styles.button}>
+              <Text style={styles.buttonText}>Start</Text>
+            </TouchableOpacity>
+          </View>
+        );
+    }
 }
 
 
